@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>How Do I?</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0;" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+
+		<link rel="stylesheet" href="css/jquery.mobile-1.0.min.css" />
+		<link rel="stylesheet" href="css/style.css" />
+		
+		<script type="text/javascript" src="js/jquery-1.6.4.min.js"></script>
+		<script type="text/javascript" src="js/jquery.mobile-1.0.min.js"></script>
+		<script type="text/javascript" src="js/cordova-2.3.0.js"></script>
+		<script type="text/javascript" src="js/custom.js"></script>
+		
+<script>
+
+
+    // Wait for PhoneGap to load
+    //
+    
+    var data = null;
+    document.addEventListener("deviceready", onDeviceReady, false);    
+	function onDeviceReady() {
+		data = jQuery.parseJSON(window.MyCls.getMenu());
+		document.addEventListener("backbutton", onBackKeyDown, false);			
+		load_menu();				        			
+	}
+		
+	function onBackKeyDown(){
+		if(depth > 0){
+			depth = depth -1;
+			load_menu();
+		}else{
+			navigator.app.exitApp();
+		}
+	    return false;
+	}
+
+
+	$('.task').live('tap', function(e) {
+		e.preventDefault();
+	    url = $(this).attr("rel");   
+	    load_task(url);
+	});
+
+	var depth = 0;
+	function load_menu() {
+		$("#content").empty();		
+		$("#numbers").empty();
+		jQuery.each(data, function(i, val) {
+			if( !(i == "Contact" || i == "Disclaimer") ){
+	  			$("#numbers").append('<li><a href="#" class="task" rel="'+i+'">' +i+'</a></li>' );
+	  		}
+		});
+		$('#numbers').listview('refresh');
+		$('#title').text('Apply For');
+	}
+
+	function load_task(n) {
+	
+		depth = 1 + depth;
+		
+		$("#content").empty();	
+		$("#numbers").empty();
+
+			ldata = data[n];		
+			for(var attr in ldata){ 		
+				if(!(attr == "title" || attr == "form")){
+					var out = "<ul>";
+					for(var i=0;i<ldata[attr].length;i++){
+						out += "<li>"+ ldata[attr][i] + "</li>";
+					}
+					out += "</ul>";
+					var	menudata =	'<div data-role="collapsible" data-collapsed="true"><h3>'+attr+'</h3>'+ out  +'</div>';	
+				    $("#content").append(menudata);		
+				}
+			}
+		
+		
+		$('#title').text(n);
+		$('#content').trigger( "create" );
+	} 
+</script>
+
+</head>
+	
+	<body>
+
+		<div data-role="page" class="page-bg" id="index">
+			<!-- Header -->
+			<div data-role="header" id="header">
+				<h1>How Do I?
+			</div>
+			<!-- /Header -->
+
+			<!-- Content -->
+			<div data-role="content" style="margin-top:200px;">
+				<h2 id="title" style="color:#3da2f0;text-shadow: 1px 1px 3px #000;padding:0 0 0 10px;"> Apply For </h2>
+				<ul id="numbers" data-role="listview" data-inset="true" data-theme="a"> </ul>
+				<div id="content"  data-role="collapsible-set" data-theme="a" data-content-theme="c"></div>
+			</div>
+			<!-- /Content -->
+
+			<!-- Footer --> 
+			<div data-role="footer" data-theme="a">
+				<div class="ui-bar">
+					<a class="task" rel="Contact" data-role="button" data-icon="plus" data-theme="a">Contact</a>
+					<a class="task" rel="Disclaimer" data-role="button" data-icon="star" data-theme="a">Disclaimer</a>
+					<a href="" data-role="button" data-icon="arrow-u" data-theme="a" style="float:right;" class="returnTopAction">Top</a>             
+				</div>
+			</div>
+			<!-- /Footer --> 
+		</div>
+
+</body>
+</html>
